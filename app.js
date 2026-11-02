@@ -483,7 +483,9 @@ const F = {
     try { await store.signIn(v.password); ui.busy = false; await connect() }
     catch (e) {
       ui.busy = false;
-      ui.loginError = e.status === 400 ? "Fel lösenord. Försök igen." : isNetwork(e) ? "Kunde inte nå servern. Kontrollera nätet och försök igen." : "Inloggningen misslyckades: " + e.message;
+      ui.loginError = e.code === "email_not_confirmed" ? "Användaren " + CFG.householdEmail + " är inte bekräftad. Bekräfta den i Supabase under Authentication → Users."
+        : e.code === "invalid_credentials" ? "Fel lösenord, eller så finns ingen användare med e-posten " + CFG.householdEmail + " i Supabase."
+        : e.status === 400 ? "Inloggningen nekades (" + (e.code || e.message) + ")." : isNetwork(e) ? "Kunde inte nå servern. Kontrollera nätet och försök igen." : "Inloggningen misslyckades: " + e.message;
       render();
     }
   },
