@@ -1,6 +1,6 @@
 /* Service worker: gör att appen startar även utan nät och kan läggas på hemskärmen.
    Höj CACHE-versionen när du ändrar någon av filerna i SHELL, så att telefonerna hämtar nytt. */
-const CACHE = "hush-v6";
+const CACHE = "hush-v7";
 const SHELL = ["./", "index.html", "style.css", "app.js", "config.js", "vendor/supabase.js", "manifest.webmanifest", "icons/icon-192.png", "icons/apple-touch-icon.png"];
 
 self.addEventListener("install", e => {

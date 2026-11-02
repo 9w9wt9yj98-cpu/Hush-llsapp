@@ -25,7 +25,7 @@ från grenen `main`, roten.
 | `index.html` | Skal: meta-taggar för iOS/PWA, typsnitt, laddar skripten i ordning `vendor/supabase.js` → `config.js` → `app.js`. |
 | `style.css` | All styling. Färger som CSS-variabler på `:root`, mörkt läge via `prefers-color-scheme`. |
 | `app.js` | Hela appen (se struktur nedan). |
-| `config.js` | Supabase-URL, publik nyckel och hushållets e-post. Tomma värden ⇒ appen visar en instruktionsvy. |
+| `config.js` | Supabase-URL och publik nyckel (tomma ⇒ instruktionsvy). `householdEmail` lämnas tomt med avsikt: e-posten skrivs i inloggningsrutan och sparas i localStorage (`hush-email`), så att ingen personlig adress hamnar i det publika repot. |
 | `sw.js` | Service worker: nätet först för egna filer, cache som reserv; cache först för Google Fonts. |
 | `manifest.webmanifest`, `icons/` | PWA-manifest och ikoner (180 px apple-touch-icon, 192/512, maskable). |
 | `vendor/supabase.js` | Incheckad UMD-bundle av `@supabase/supabase-js` 2.45.4 (ger `window.supabase`). |
@@ -68,10 +68,10 @@ Senaste skrivningen till servern vinner.
 
 ## Inloggning och säkerhet
 
-- Hushållet har **en** gemensam användare i Supabase Auth (e-post i `config.js`, lösenordet bara i huvudet/nyckelringen).
+- Hushållet har **en** gemensam användare i Supabase Auth (e-post och lösenord skrivs i appen, aldrig i repot).
   Registrering är avstängd i Supabase.
 - RLS: bara rollen `authenticated` får läsa/skriva `items`; `anon` har inga rättigheter. Den publika nyckeln i
-  `config.js` är därför ofarlig att checka in. **Checka aldrig in `service_role`-nyckeln, lösenordet eller exporterad data**
+  `config.js` är därför ofarlig att checka in. **Checka aldrig in `service_role`-nyckeln, lösenordet, hushållets e-post eller exporterad data**
   (repot är publikt för att Pages ska fungera gratis).
 - Sessionen sparas i localStorage (`hush-auth`). På iPhone har hemskärmsappen egen lagring, skild från Safari.
 - All text som ritas ut går genom `esc()`. Behåll det i nya vyer.

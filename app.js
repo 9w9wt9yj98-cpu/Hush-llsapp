@@ -30,8 +30,8 @@ const supaStore = {
     });
   },
   async session() { const { data } = await this.sb.auth.getSession(); return data.session },
-  async signIn(password) {
-    const { error } = await this.sb.auth.signInWithPassword({ email: CFG.householdEmail, password });
+  async signIn(email, password) {
+    const { error } = await this.sb.auth.signInWithPassword({ email, password });
     if (error) throw mkErr(error, error.status);
   },
   async signOut() { try { await this.sb.auth.signOut() } catch (e) {} },
@@ -245,13 +245,13 @@ const nowLine = () => { const t = today(); return cap(fmt(t, { weekday:"long", d
 function vLoading() { return header("Kylskåpsdörren", "Öppnar…") }
 function vSetup() {
   return header("Kylskåpsdörren", "Appen är inte kopplad till någon databas än") +
-  '<div class="paper"><p>Fyll i <code>supabaseUrl</code>, <code>supabaseKey</code> och <code>householdEmail</code> i <code>config.js</code>. Stegen står i README.md i repot.</p>' +
+  '<div class="paper"><p>Fyll i <code>supabaseUrl</code> och <code>supabaseKey</code> i <code>config.js</code>. Stegen står i README.md i repot.</p>' +
   '<p class="sub">Vill du bara prova? Öppna <a href="?demo">demoläget</a>, där allt sparas lokalt i webbläsaren.</p></div>';
 }
 function vLogin() {
   return header("Kylskåpsdörren", "Hushållets lista, matsedel och kalender") +
-  '<form class="paper" data-f="login"><h2>Logga in</h2><p class="sub">Ni delar ett gemensamt lösenord för hushållet. Du behöver bara logga in en gång per telefon.</p>' +
-  '<input class="vh" name="username" autocomplete="username" tabindex="-1" aria-hidden="true" value="' + esc(CFG.householdEmail) + '" readonly>' +
+  '<form class="paper" data-f="login"><h2>Logga in</h2><p class="sub">Ni delar en gemensam inloggning för hushållet. Du behöver bara logga in en gång per telefon.</p>' +
+  '<label>Hushållets e-post<input id="em" name="email" type="email" autocomplete="username" autocapitalize="off" spellcheck="false" required value="' + esc(lsGet("hush-email") || CFG.householdEmail || "") + '"></label>' +
   '<label>Hushållets lösenord<input id="pw" name="password" type="password" autocomplete="current-password" required></label>' +
   (ui.loginError ? '<p class="err" role="alert">' + esc(ui.loginError) + '</p>' : '') +
   '<button class="primary"' + (ui.busy ? ' disabled' : '') + '>' + (ui.busy ? 'Loggar in…' : 'Logga in') + '</button></form>';
@@ -480,11 +480,12 @@ const F = {
   login: async v => {
     if (ui.busy) return;
     ui.busy = true; ui.loginError = null; render();
-    try { await store.signIn(v.password); ui.busy = false; await connect() }
+    const email = v.email.trim().toLowerCase();
+    try { await store.signIn(email, v.password); lsSet("hush-email", email); ui.busy = false; await connect() }
     catch (e) {
       ui.busy = false;
-      ui.loginError = e.code === "email_not_confirmed" ? "Användaren " + CFG.householdEmail + " är inte bekräftad. Bekräfta den i Supabase under Authentication → Users."
-        : e.code === "invalid_credentials" ? "Fel lösenord, eller så finns ingen användare med e-posten " + CFG.householdEmail + " i Supabase."
+      ui.loginError = e.code === "email_not_confirmed" ? "Användaren " + v.email.trim() + " är inte bekräftad. Bekräfta den i Supabase under Authentication → Users."
+        : e.code === "invalid_credentials" ? "Fel e-post eller lösenord. Kontrollera att användaren finns i Supabase under Authentication → Users."
         : e.status === 400 ? "Inloggningen nekades (" + (e.code || e.message) + ")." : isNetwork(e) ? "Kunde inte nå servern. Kontrollera nätet och försök igen." : "Inloggningen misslyckades: " + e.message;
       render();
     }
@@ -546,7 +547,7 @@ window.addEventListener("online", () => refresh());
 /* ---------- Start ---------- */
 render();
 (async () => {
-  if (!DEMO && !(CFG.supabaseUrl && CFG.supabaseKey && CFG.householdEmail && window.supabase)) { ui.phase = "setup"; render(); return }
+  if (!DEMO && !(CFG.supabaseUrl && CFG.supabaseKey && window.supabase)) { ui.phase = "setup"; render(); return }
   store.init();
   store.onSignOut(() => { if (ui.phase === "app") signedOut() });
   let s = null; try { s = await store.session() } catch (e) {}

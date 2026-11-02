@@ -13,17 +13,17 @@ Vill du bara prova? Öppna appen med `?demo` på slutet av adressen. Då sparas 
 1. Skapa ett gratiskonto på [supabase.com](https://supabase.com) och ett nytt projekt (välj region i EU, t.ex. Stockholm eller Frankfurt).
 2. Öppna **SQL Editor**, klistra in hela innehållet i [`supabase/schema.sql`](supabase/schema.sql) och tryck **Run**.
 3. Gå till **Authentication → Sign In / Providers** och stäng av **Allow new users to sign up**. Då kan ingen annan skapa ett konto.
-4. Gå till **Authentication → Users → Add user → Create new user**. Ange en e-postadress (den behöver inte vara riktig, t.ex. `hem@vart-hushall.se`), ett starkt lösenord och kryssa i **Auto Confirm User**. Det här är hushållets gemensamma inloggning, som ni båda använder.
+4. Gå till **Authentication → Users → Add user → Create new user**. Ange en riktig e-postadress (Supabase avvisar ofta påhittade), ett starkt lösenord och kryssa i **Auto Confirm User**. Det här är hushållets gemensamma inloggning, som ni båda använder.
 
 ### 2. Koppla appen till databasen
 
-Öppna **Project Settings → API Keys** (eller **Data API**) i Supabase och fyll i [`config.js`](config.js):
+Öppna **Project Settings → API Keys** (eller **Data API**) i Supabase och fyll i [`config.js`](config.js). E-posten kan lämnas tom; då skriver ni in den i appen vid inloggning och den hamnar aldrig i repot:
 
 ```js
 window.HUSH_CONFIG = {
   supabaseUrl: "https://<ditt-projekt>.supabase.co",
   supabaseKey: "<publishable / anon key>",
-  householdEmail: "hem@vart-hushall.se",
+  householdEmail: "",
 };
 ```
 
@@ -39,7 +39,7 @@ På ett gratiskonto måste repot vara publikt för att Pages ska fungera. Det ä
 ### 4. Lägg appen på hemskärmen
 
 På varje iPhone: öppna adressen i **Safari**, tryck på dela-knappen och välj **Lägg till på hemskärmen**.
-Öppna appen från hemskärmen och logga in med hushållets lösenord. Det behövs bara en gång per telefon.
+Öppna appen från hemskärmen och logga in med hushållets e-post och lösenord. Det behövs bara en gång per telefon.
 
 Logga in från hemskärmsikonen, inte i Safari: på iPhone har hemskärmsappen en egen inloggning skild från Safari.
 

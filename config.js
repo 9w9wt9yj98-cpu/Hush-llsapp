@@ -5,5 +5,5 @@
 window.HUSH_CONFIG = {
   supabaseUrl: "https://lkvzhiafarrczbikkkno.supabase.co",
   supabaseKey: "sb_publishable_1O7Dvg9Lm6s-qWpniP0BHA__NjbN-zQ",
-  householdEmail: "hem@example.com",
+  householdEmail: "",   // valfritt: fylls i i inloggningsrutan om det anges. Lämnas tomt så syns ingen e-post i repot.
 };
